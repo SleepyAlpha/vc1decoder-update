@@ -1,0 +1,28 @@
+w_metadata vc1decoder dlls \
+    title="VC-1 (WVC1) decoder for WMP 8 and 9" \
+    publisher="Microsoft" \
+    year="2005" \
+    media="download" \
+    file1="wvc1dmo.cab" \
+    installed_file1="$W_SYSTEM32_DLLS_WIN/wvc1dmod.dll"
+
+load_vc1decoder()
+{
+    # https://www.microsoft.com/en-us/download/details.aspx?id=33282
+    w_download "https://web.archive.org/web/20200803170420/https://download.microsoft.com/download/e/2/f/e2fcec4b-6c8b-48b7-adab-ab9c403a978f/${file1}" 920582e6ca4103705a55cee55179f4f855e740c1b408d264aa790a888b6df884
+    w_try_cabextract --directory="$W_SYSTEM32_DLLS" -F wvc1dmod.dll "${W_CACHE}/${W_PACKAGE}/${file1}"
+    w_try_regsvr wvc1dmod.dll
+    load_msdmo
+}
+
+load_msdmo()
+{
+    helper_win7sp1 x86_microsoft-windows-directshow-dmo_31bf3856ad364e35_6.1.7601.17514_none_1c9dab395ceb2d5a/msdmo.dll
+    w_try cp "$W_TMP/x86_microsoft-windows-directshow-dmo_31bf3856ad364e35_6.1.7601.17514_none_1c9dab395ceb2d5a/msdmo.dll" "$W_SYSTEM32_DLLS/msdmo.dll"
+    w_override_dlls native,builtin msdmo
+
+    if [ "$W_ARCH" = "win64" ]; then
+        helper_win7sp1_x64 amd64_microsoft-windows-directshow-dmo_31bf3856ad364e35_6.1.7601.17514_none_78bc46bd15489e90/msdmo.dll
+        w_try cp "$W_TMP/amd64_microsoft-windows-directshow-dmo_31bf3856ad364e35_6.1.7601.17514_none_78bc46bd15489e90/msdmo.dll" "$W_SYSTEM64_DLLS/msdmo.dll"
+    fi
+}
